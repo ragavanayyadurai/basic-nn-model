@@ -1,166 +1,100 @@
-# Developing a Neural Network Regression Model
-
-## AIM
-
+# EX 01 Developing a Neural Network Regression Model
+### Name: Ragavendran A
+### Reference No: 212222230114
+## AIM:
 To develop a neural network regression model for the given dataset.
 
-## THEORY
+## THEORY:
+Neural network regression is a supervised learning method, and therefore requires a tagged dataset, which includes a label column. Because a regression model predicts a numerical value, the label column must be a numerical data type. A neural network regression model uses interconnected layers of artificial neurons to learn the mapping between input features and a continuous target variable. It leverages activation functions like ReLU to capture non-linear relationships beyond simple linear trends. Training involves minimizing the loss function (e.g., Mean Squared Error) through an optimizer (e.g., Gradient Descent). Regularization techniques like L1/L2 and dropout prevent overfitting. This approach offers flexibility and high accuracy for complex regression problems.
 
-The problem statement for developing a neural network regression model involves predicting a continuous value output based on a set of input features. In regression tasks, the goal is to learn a mapping from input variables to a continuous target variable.
+## Neural Network Model:
+![image](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/c71084e5-1607-4f8f-936b-d1dca9935e71)
 
-## Neural Network Model
-
-![out1](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/9b814fb1-f62c-48b2-b98a-b0c5ae0f755a)
-
-
-## DESIGN STEPS
+## DESIGN STEPS:
 
 ### STEP 1:
-
 Loading the dataset
-
 ### STEP 2:
-
 Split the dataset into training and testing
-
 ### STEP 3:
-
 Create MinMaxScalar objects ,fit the model and transform the data.
-
 ### STEP 4:
-
 Build the Neural Network Model and compile the model.
-
 ### STEP 5:
-
 Train the model with the training data.
-
 ### STEP 6:
-
 Plot the performance plot
-
 ### STEP 7:
-
 Evaluate the model with the testing data.
 
-## PROGRAM
+## PROGRAM:
 ### Name: Ragavendran A
-### Register Number: 212222230114
+### Reference No: 212222230114
 ```
-#DEPENDENCIES:
-
 from google.colab import auth
 import gspread
 from google.auth import default
-
 import pandas as pd
+
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-import matplotlib.pyplot as plt
 
-from tensorflow.keras.models import Sequential as Seq
-from tensorflow.keras.layers import Dense as Den
-from tensorflow.keras.metrics import RootMeanSquaredError as rmse
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
 
 auth.authenticate_user()
 creds, _ = default()
 gc = gspread.authorize(creds)
 
-#DATA FROM SHEETS:
+worksheet = gc.open('exp no 1').sheet1
+data=worksheet.get_all_values()
+print(data)
 
-worksheet = gc.open("DL ex 1").sheet1
-rows=worksheet.get_all_values()
+dataset1 = pd.DataFrame(data[1:], columns=data[0])
+dataset1 = dataset1.astype({'Input':'float'})
+dataset1 = dataset1.astype({'Output':'float'})
 
-df = pd.DataFrame(rows[1:], columns=rows[0])
-df = df.astype({'Input':'int'})
-df = df.astype({'Output':'int'})
-print(df)
+X = dataset1[['Input']].values
+y = dataset1[['Output']].values
 
-df.head()
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size = 0.30,random_state = 30)
 
-#DATA VISUALIZATION:
+Scaler = MinMaxScaler()
+Scaler.fit(X_train)
+X_train1 = Scaler.transform(X_train)
 
- x = df[["Input"]] .values
- y = df[["Output"]].values
+ai_model=Sequential([
+    Dense(units=8,activation='relu',input_shape=[1]),
+    Dense(units=9,activation='relu'),
+    Dense(units=1)
+])
 
-#DATA SPLIT AND PREPROCESSING:
+ai_model.compile(optimizer='rmsprop',loss='mse')
 
-scaler = MinMaxScaler()
-scaler.fit(x)
-x_n = scaler.fit_transform(x)
-x_train,x_test,y_train,y_test = train_test_split(x_n,y,test_size = 0.3,random_state = 3)
+ai_model.fit(X_train1,y_train,epochs=20)
 
-print(x_train)
-print(x_test)
+loss_df = pd.DataFrame(ai_model.history.history)
+loss_df.plot()
 
-#REGRESSIVE MODEL:
+X_test1 = Scaler.transform(X_test)
+ai_model.evaluate(X_test1,y_test)
 
- model = Seq([
- Den(4,activation = 'relu',input_shape=[1]),
- Den(6),
- Den(3,activation = 'relu'),
- Den(1),
- ])
-
- model.compile(optimizer = 'rmsprop',loss = 'mse')
- model.fit(x_train,y_train,epochs=20)
- model.fit(x_train,y_train,epochs=20)
-
-#LOSS CALCULATION:
-
-loss_plot = pd.DataFrame(model.history.history)
-loss_plot.plot()
-
- err = rmse()
- preds = model.predict(x_test)
- err(y_test,preds)
-
- x_n1 = [[30]]
- x_n_n = scaler.transform(x_n1)
- model.predict(x_n_n)
-
-#PREDICTION:
-
-y_pred=model.predict(x_test)
-y_pred
-
+X_n1 = [[30]]
+X_n1_1 = Scaler.transform(X_n1)
+ai_model.predict(X_n1_1)
 ```
-## Dataset Information
+## Dataset Information:
+![image](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/dbd620aa-e125-42ec-8882-cd0eafb19938)
 
-![out2](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/1e903112-7fa9-414b-ab67-12473e653046)
-
-
-## OUTPUT
-
-### Head():
-![out3](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/9c384a94-b507-4710-b21b-b817cf499950)
-
-### value of X_train and X_test:
-
-![out4](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/7ef11fe0-45c2-4fd1-9f72-32c1bcabf647)
-
-### ARCHITECTURE AND TRAINING:
-
-![out5](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/e22acb7b-f16d-42ef-aa6b-fc5ac0116b20)
-
-![out6](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/98cc7091-06bb-4ea2-a994-c946ca81b14e)
-
-
+## OUTPUT:
 ### Training Loss Vs Iteration Plot
-
-![out7](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/fa8c36ae-5a48-48eb-8232-bb1efe4fd92e)
+![image](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/eacf4e3c-7596-42be-84a5-44a58c035efa)
 
 ### Test Data Root Mean Squared Error
-
-![out8](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/f459d60c-f3a1-4803-82d8-0112946cc298)
-
-![out9](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/eb2c8cf0-720d-45c1-be58-c054876a26df)
+![image](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/3978ceda-c84d-446d-acde-e6cf0571a325)
 
 ### New Sample Data Prediction
-
-![out10](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/cba309b4-ed29-4827-b90b-ed75efb97da6)
+![image](https://github.com/ragavanayyadurai/basic-nn-model/assets/118749557/35d901c2-b549-473f-b963-62a0d1cb47ce)
 
 ## RESULT
-
-A neural network regression model for the given dataset is developed.
-
+A neural network regression model for the given dataset has been developed successfully.
